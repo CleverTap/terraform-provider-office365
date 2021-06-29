@@ -121,39 +121,39 @@ data "office365_users" "example" {
 
 ### Argument Reference
 
-- ``client_id`` (required,string) - The office365 client ID.This may also be set via the "OFFICE365_CLIENT_ID" environment variable.
+- ``client_id`` (required, string) - The office365 client ID.This may also be set via the ``OFFICE365_CLIENT_ID`` environment variable.
 
-- ``client_secret`` (required,string) -  The office365 client secret.This may also be set via the "OFFICE365_CLIENT_SECRET" environment variable.
+- ``client_secret`` (required, string) -  The office365 client secret.This may also be set via the ``OFFICE365_CLIENT_SECRET`` environment variable.
 
-- ``tenant_id`` (required,string) - The office365 Tenant ID.This may also be set via the "OFFICE365_TENANT_ID" environment variable.
+- ``tenant_id`` (required, string) - The office365 Tenant ID.This may also be set via the ``OFFICE365_TENANT_ID`` environment variable.
 
-- ``display_name`` (required,String) -The name displayed in the address book for the user. This is usually the combination of the user's first name, middle initial and last name.<br/>
+- ``display_name`` (required, string) - The name displayed in the address book for the user. This is usually the combination of the user's first name, middle initial and last name.<br/>
 
-- ``user_principal_name`` (required,string) -The user principal name (UPN) of the user. The UPN is an Internet-style login name for the user based on the Internet standard RFC 822. By convention, this should map to the user's email name. The general format is alias@domain, where domain must be present in the tenant's collection of verified domains. This property is required when a user is created. 
+- ``user_principal_name`` (required, string) - The user principal name (UPN) of the user. The UPN is an Internet-style login name for the user based on the Internet standard RFC 822. By convention, this should map to the user's email name. The general format is alias@domain, where domain must be present in the tenant's collection of verified domains. This property is required when a user is created. 
 
-- ``password`` (required,string) - password for created user.<br/>
-- ``force_change_password_nextsignin`` (required,boolean) - It will force to change the password when user singin for first time.
+- ``password`` (required, string) - Password for created user.<br/>
+- ``force_change_password_nextsignin`` (required, boolean) - It will force to change the password when user singin for first time.
 
-- ``account_enabled`` (optional,boolean) - Takes only true/false as input and allow us to activate/deactivate account(Default:true).
+- ``account_enabled`` (optional, boolean) - Takes only true/false as input and allow us to activate/deactivate account(Default:true).
 
-- ``given_name`` (optional,string) - first name of user.
+- ``given_name`` (optional, string) - First name of user.
 
-- ``surname`` (optional,string) - second name of user.
+- ``surname`` (optional, string) - Second name of user.
 
-- ``jobtitle`` (optional,string) - The user's job title. Maximum length is 128 characters.
+- ``jobtitle`` (optional, string) - The user's job title. Maximum length is 128 characters.
 
-- ``office_location``(optional,string) - office location of user.
+- ``office_location``(optional, string) - Office location of user.
 
-- ``mail_nick_name`` (optional,string) - The mail alias for the user.
+- ``mail_nick_name`` (optional, string) - The mail alias for the user.
 
-- ``mobile_phone`` (optional,string) - The primary cellular telephone number for the user.
-- ``postal_code`` (optional,string) - The postal code for the user's postal address. The postal code is specific to the user's country/region.
+- ``mobile_phone`` (optional, string) - The primary cellular telephone number for the user.
+- ``postal_code`` (optional, string) - The postal code for the user's postal address. The postal code is specific to the user's country/region.
 
-- ``state`` (optional,string) - The state or province in the user's address.
-- ``preferred_language`` (optional,string) - The preferred language for the user. Should follow ISO 639-1 Code; for example "en-US".
-- ``street_address`` (optional,string) - The street address of the user's place of business.
-- ``usage_location`` (optional,string) - A two letter country code (ISO standard 3166). Required for users that will be assigned licenses due to legal requirement to check for availability of services in countries. Examples include: "US", "JP", "GB" etc.
+- ``state`` (optional, string) - The state or province in the user's address.
+- ``preferred_language`` (optional, string) - The preferred language for the user. Should follow ISO 639-1 Code; for example "en-US".
+- ``street_address`` (optional, string) - The street address of the user's place of business.
+- ``usage_location`` (optional, string) - A two letter country code (ISO standard 3166). Required for users that will be assigned licenses due to legal requirement to check for availability of services in countries. Examples include: "US", "JP", "GB" etc.
 
 
 ### Exceptions
-- Read User API only sends defined attributes in response, you can find the list [here](https://docs.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#response-1).
+- Read User API only reads defined attributes in response, you can find the list [here](https://docs.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#response-1).
