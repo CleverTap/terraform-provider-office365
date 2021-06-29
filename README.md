@@ -104,7 +104,7 @@ resource "office365_user_manage" "example" {
    display_name        ="user full name"
    mail_nick_name      ="nick name"
    user_principal_name ="example@<officce365domain>.onmicrosoft.com"
-   password            ="*******"
+   password            ="********"
    account_enabled     ="true"
 }
 
