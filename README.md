@@ -166,7 +166,9 @@ data "office365_users" "example" {
 - ``preferred_language`` (optional, string) - The preferred language for the user. Should follow ISO 639-1 Code; for example "en-US".
 - ``street_address`` (optional, string) - The street address of the user's place of business.
 - ``usage_location`` (optional, string) - A two letter country code (ISO standard 3166). Required for users that will be assigned licenses due to legal requirement to check for availability of services in countries. Examples include: "US", "JP", "GB" etc.
-
+- ``licenses`` (optional, string) - Set of licenses to be assigned.
+- ``disabled_plans`` (optional, string) - Id's of Service Plans that should not be provisionied for the user.
+- ``skuid`` (optional, string) - Id of the License to be assigned to the user.
 
 ### Exceptions
 - Read User API only reads defined attributes in response, you can find the list [here](https://docs.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#response-1).
