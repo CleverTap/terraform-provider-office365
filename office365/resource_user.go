@@ -234,7 +234,7 @@ func resourceUserRead(ctx context.Context, d *schema.ResourceData, m interface{}
 		return nil
 	})
 	if retryErr != nil {
-		if strings.Contains(retryErr.Error(), "does not exist") == true {
+		if strings.Contains(retryErr.Error(), "ResourceNotFound") == true {
 			d.SetId("")
 			return diags
 		}

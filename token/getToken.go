@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 )
@@ -16,8 +14,7 @@ type TokenResponse struct {
 	AccessToken string `json:"access_token"`
 }
 
-func GetToken(clientID, clientScret, tenantID string) error {
-	log.Println("geting Token..")
+func GetToken(clientID, clientScret, tenantID string) (string, error) {
 	url_path := "https://login.microsoftonline.com/" + tenantID + "/oauth2/token"
 	data := url.Values{}
 	data.Set("grant_type", "client_credentials")
@@ -25,25 +22,29 @@ func GetToken(clientID, clientScret, tenantID string) error {
 	data.Set("client_secret", clientScret)
 	data.Set("resource", "https://graph.microsoft.com")
 	encodedData := data.Encode()
-	req, _ := http.NewRequest("POST", url_path, strings.NewReader(encodedData))
+	req, err := http.NewRequest("POST", url_path, strings.NewReader(encodedData))
+	if err != nil {
+		return "", err
+	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-	res, _ := http.DefaultClient.Do(req)
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		return fmt.Errorf("something is wrong as status code is %d", res.StatusCode)
+		return "", fmt.Errorf("something is wrong as status code is %d", res.StatusCode)
 	}
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return err
+		return "", err
 	}
 	respone := TokenResponse{}
-	json.Unmarshal(body, &respone)
-	if respone.AccessToken == "" {
-		return fmt.Errorf("Please check your credentials")
+	err = json.Unmarshal(body, &respone)
+	if err != nil {
+		return "", err
 	}
 	bearer := "Bearer " + respone.AccessToken
-	os.Setenv("bearer", bearer)
-	log.Println("Token aquired")
-	return nil
+	return bearer, nil
 }

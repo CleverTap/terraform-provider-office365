@@ -139,7 +139,7 @@ func (c *Client) GetUser(UserId string) (*User, error) {
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return &recieveduser, nil
 	} else {
-		return nil, fmt.Errorf(string(body))
+		return nil, fmt.Errorf(string(body) + fmt.Sprintf(", StatusCode: %v", res.StatusCode))
 	}
 }
 
@@ -180,7 +180,7 @@ func (c *Client) CreateUser(userCreateInfo CreatUser) (*User, error) {
 	if res.StatusCode >= 200 && res.StatusCode <= 299 {
 		return &user, nil
 	} else {
-		return nil, fmt.Errorf(string(body))
+		return nil, fmt.Errorf(string(body) + fmt.Sprintf(", StatusCode: %v", res.StatusCode))
 	}
 }
 
@@ -212,7 +212,7 @@ func (c *Client) UpdateUser(UserId string, userUpdateInfo UpdateUser) error {
 		return nil
 	} else {
 		log.Printf("Error my : %v \n Body : %s", Errors[res.StatusCode], res.Body)
-		return fmt.Errorf("%v \nbody: %s", Errors[res.StatusCode], res.Body)
+		return fmt.Errorf("%v \nbody: %s", res.StatusCode, res.Body)
 	}
 }
 
@@ -235,7 +235,7 @@ func (c *Client) DeleteUser(UserId string) error {
 		return nil
 	} else {
 		log.Println(Errors[res.StatusCode], err)
-		return fmt.Errorf("%s", res.Body)
+		return fmt.Errorf("%s, %v", res.Body, res.StatusCode)
 	}
 }
 
@@ -268,7 +268,7 @@ func (c *Client) AddRemoveLicenses(userPrincipalName string, licensesArray Licen
 	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
 		return nil
 	} else {
-		return fmt.Errorf(string(respBody))
+		return fmt.Errorf(string(respBody) + fmt.Sprintf(", StatusCode: %v", resp.StatusCode))
 	}
 }
 
@@ -292,7 +292,7 @@ func (c *Client) GetLicenseDetails(userPrincipalName string) ([]AssignLicenses, 
 		return nil, err
 	}
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		return nil, fmt.Errorf(string(body))
+		return nil, fmt.Errorf(string(body) + fmt.Sprintf(", StatusCode: %v", resp.StatusCode))
 	}
 	licensesMap := Response{}
 	err = json.Unmarshal(body, &licensesMap)

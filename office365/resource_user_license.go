@@ -2,7 +2,10 @@ package office365
 
 import (
 	"context"
+	"time"
+	"strings"
 	"terraform-provider-office365/client"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
@@ -67,9 +70,19 @@ func resourceUserLicenseCreate(ctx context.Context, d *schema.ResourceData, m in
 	licensesArray := client.License{
 		AddLicenses: assignLicenseArray,
 	}
-	err := c.AddRemoveLicenses(userPrincipalName, licensesArray)
-	if err != nil {
-		return diag.FromErr(err)
+	retryErr := resource.Retry(2*time.Minute, func() *resource.RetryError {
+		err := c.AddRemoveLicenses(userPrincipalName, licensesArray)
+		if err != nil {
+			if c.IsRetry(err) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		return nil
+	})
+	if retryErr != nil {
+		time.Sleep(2 * time.Second)
+		return diag.FromErr(retryErr)
 	}
 	d.SetId(userPrincipalName)
 	return diags
@@ -78,19 +91,33 @@ func resourceUserLicenseCreate(ctx context.Context, d *schema.ResourceData, m in
 func resourceUserLicenseRead(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	var diags diag.Diagnostics
 	c := m.(*client.Client)
-	body, err := c.GetLicenseDetails(d.Id())
-	if err != nil {
-		return diag.FromErr(err)
+	retryErr := resource.Retry(2*time.Minute, func() *resource.RetryError {
+		body, err := c.GetLicenseDetails(d.Id())
+		if err != nil {
+			if c.IsRetry(err) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		var licenses []interface{}
+		for _, v := range body {
+			license := make(map[string]interface{})
+			license["disabled_plans"] = v.DisabledPlans
+			license["skuid"] = v.SkuId
+			licenses = append(licenses, license)
+		}
+		d.Set("licenses", licenses)
+		d.Set("user_principal_name", d.Id())
+		return nil
+	})
+	if retryErr != nil {
+		time.Sleep(2 * time.Second)
+		if strings.Contains(retryErr.Error(), "ResourceNotFound") == true {
+			d.SetId("")
+			return diags
+		}
+		return diag.FromErr(retryErr)
 	}
-	var licenses []interface{}
-	for _, v := range body {
-		license := make(map[string]interface{})
-		license["disabled_plans"] = v.DisabledPlans
-		license["skuid"] = v.SkuId
-		licenses = append(licenses, license)
-	}
-	d.Set("licenses", licenses)
-	d.Set("user_principal_name", d.Id())
 	return diags
 }
 
@@ -121,9 +148,21 @@ func resourceUserLicenseUpdate(ctx context.Context, d *schema.ResourceData, m in
 		}
 		assignLicenseArray = append(assignLicenseArray, assignLicense)
 	}
-	body, err := c.GetLicenseDetails(userPrincipalName)
-	if err != nil {
-		return diag.FromErr(err)
+	var body []client.AssignLicenses
+	var err error
+	retryErr := resource.Retry(2*time.Minute, func() *resource.RetryError {
+		body, err = c.GetLicenseDetails(userPrincipalName)
+		if err != nil {
+			if c.IsRetry(err) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		return nil
+	})
+	if retryErr != nil {
+		time.Sleep(2 * time.Second)
+		return diag.FromErr(retryErr)
 	}
 	checkMap := make(map[string]bool)
 	for _, v := range assignLicenseArray {
@@ -150,9 +189,21 @@ func resourceUserLicenseDelete(ctx context.Context, d *schema.ResourceData, m in
 	var diags diag.Diagnostics
 	c := m.(*client.Client)
 	userPrincipalName := d.Id()
-	body, err := c.GetLicenseDetails(userPrincipalName)
-	if err != nil {
-		return diag.FromErr(err)
+	var body []client.AssignLicenses
+	var err error
+	retryErr := resource.Retry(2*time.Minute, func() *resource.RetryError {
+		body, err = c.GetLicenseDetails(userPrincipalName)
+		if err != nil {
+			if c.IsRetry(err) {
+				return resource.RetryableError(err)
+			}
+			return resource.NonRetryableError(err)
+		}
+		return nil
+	})
+	if retryErr != nil {
+		time.Sleep(2 * time.Second)
+		return diag.FromErr(retryErr)
 	}
 	var removeLicenses []string
 	for _, v := range body {
