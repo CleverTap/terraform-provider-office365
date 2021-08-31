@@ -108,6 +108,19 @@ resource "office365_user_manage" "example" {
    account_enabled     ="true"
 }
 
+resource "office365_user_license" "example" {
+  user_principal_name = "example@<officce365domain>.onmicrosoft.com"
+  licenses {
+    disabled_plans = [
+      "07699545-9485-468e-95b6-2fca3738be23",
+      "0feaeb32-d00e-4d66-bd5a-43b5b83db852",
+      "14ab5db5-e6c4-4b20-b4bc-13e36fd22298",
+      "199a5c09-e0ca-4e37-8f7c-b05d533e1e24",
+      "28b0fa46-c39a-4188-89e2-58e979a6b015",
+    ]
+    skuid          = "c42b9cae-ea4f-4ab7-9717-81576235cc45"
+  }
+}
 
 #Get user Information
 data "office365_users" "example" {
