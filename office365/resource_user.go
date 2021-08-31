@@ -247,7 +247,6 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 	c := m.(*client.Client)
 	var diags diag.Diagnostics
 	if d.HasChange("user_principal_name") {
-		d.SetId("")
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Can't update Principal Name",
@@ -256,7 +255,6 @@ func resourceUserUpdate(ctx context.Context, d *schema.ResourceData, m interface
 		return diags
 	}
 	if d.HasChange("password") {
-		d.SetId("")
 		diags = append(diags, diag.Diagnostic{
 			Severity: diag.Error,
 			Summary:  "Can't update password",

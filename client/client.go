@@ -70,6 +70,20 @@ type UpdateUser struct {
 	UsageLocation     string `json:"usageLocation,omitempty"`
 }
 
+type AssignLicenses struct {
+	DisabledPlans []string `json:"disabledPlans"`
+	SkuId         string   `json:"skuId"`
+}
+
+type License struct {
+	AddLicenses    []AssignLicenses `json:"addLicenses"`
+	RemoveLicenses []string         `json:"removeLicenses"`
+}
+
+type Response struct {
+	Value []map[string]interface{} `json:"value"`
+}
+
 var (
 	Errors = make(map[int]string)
 )
@@ -223,6 +237,83 @@ func (c *Client) DeleteUser(UserId string) error {
 		log.Println(Errors[res.StatusCode], err)
 		return fmt.Errorf("%s", res.Body)
 	}
+}
+
+func (c *Client) AddRemoveLicenses(userPrincipalName string, licensesArray License) error {
+	body, err := json.Marshal(licensesArray)
+	if err != nil {
+		return err
+	}
+	URL := c.BaseUrl + userPrincipalName + "/assignLicense"
+	req, err := http.NewRequest("POST", URL, strings.NewReader(string(body)))
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		return err
+	}
+	req.Header.Set("authorization", c.authToken)
+	req.Header.Add("content-type", "application/json")
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		return err
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	respBody, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode >= 200 && resp.StatusCode <= 299 {
+		return nil
+	} else {
+		return fmt.Errorf(string(respBody))
+	}
+}
+
+func (c *Client) GetLicenseDetails(userPrincipalName string) ([]AssignLicenses, error) {
+	URL := c.BaseUrl + userPrincipalName + "/licenseDetails"
+	req, err := http.NewRequest("GET", URL, nil)
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		return nil, err
+	}
+	req.Header.Set("authorization", c.authToken)
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		return nil, err
+	}
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("[ERROR]: ", err)
+		return nil, err
+	}
+	if resp.StatusCode < 200 || resp.StatusCode > 299 {
+		return nil, fmt.Errorf(string(body))
+	}
+	licensesMap := Response{}
+	err = json.Unmarshal(body, &licensesMap)
+	if err != nil {
+		return nil, err
+	}
+	licensesValue := licensesMap.Value
+	var assignLicenses []AssignLicenses
+	for _, license := range licensesValue {
+		assignLicense := AssignLicenses{
+			SkuId: license["skuId"].(string),
+		}
+		for _, l := range license["servicePlans"].([]interface{}) {
+			servicePlan := l.(map[string]interface{})
+			if servicePlan["provisioningStatus"].(string) == "Disabled" {
+				assignLicense.DisabledPlans = append(assignLicense.DisabledPlans, servicePlan["servicePlanId"].(string))
+			}
+		}
+		assignLicenses = append(assignLicenses, assignLicense)
+	}
+	return assignLicenses, nil
 }
 
 func (c *Client) IsRetry(err error) bool {
