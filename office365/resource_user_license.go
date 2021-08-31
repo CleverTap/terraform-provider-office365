@@ -125,7 +125,7 @@ func resourceUserLicenseUpdate(ctx context.Context, d *schema.ResourceData, m in
 	if err != nil {
 		return diag.FromErr(err)
 	}
-	var checkMap map[string]bool
+	checkMap := make(map[string]bool)
 	for _, v := range assignLicenseArray {
 		checkMap[v.SkuId] = true
 	}
