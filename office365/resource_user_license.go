@@ -89,7 +89,7 @@ func resourceUserLicenseRead(ctx context.Context, d *schema.ResourceData, m inte
 		license["skuid"] = v.SkuId
 		licenses = append(licenses, license)
 	}
-	d.Set("license", licenses)
+	d.Set("licenses", licenses)
 	d.Set("user_principal_name", d.Id())
 	return diags
 }
@@ -182,7 +182,7 @@ func resourceUserLicenseImporter(ctx context.Context, d *schema.ResourceData, m 
 		license["skuid"] = v.SkuId
 		licenses = append(licenses, license)
 	}
-	d.Set("license", licenses)
+	d.Set("licenses", licenses)
 	d.Set("user_principal_name", d.Id())
 	return []*schema.ResourceData{d}, nil
 }
