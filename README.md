@@ -108,6 +108,19 @@ resource "office365_user_manage" "example" {
    account_enabled     ="true"
 }
 
+resource "office365_user_license" "example" {
+  user_principal_name = "example@<officce365domain>.onmicrosoft.com"
+  licenses {
+    disabled_plans = [
+      "07699545-9485-468e-95b6-2fca3738be23",
+      "0feaeb32-d00e-4d66-bd5a-43b5b83db852",
+      "14ab5db5-e6c4-4b20-b4bc-13e36fd22298",
+      "199a5c09-e0ca-4e37-8f7c-b05d533e1e24",
+      "28b0fa46-c39a-4188-89e2-58e979a6b015",
+    ]
+    skuid          = "c42b9cae-ea4f-4ab7-9717-81576235cc45"
+  }
+}
 
 #Get user Information
 data "office365_users" "example" {
@@ -153,7 +166,9 @@ data "office365_users" "example" {
 - ``preferred_language`` (optional, string) - The preferred language for the user. Should follow ISO 639-1 Code; for example "en-US".
 - ``street_address`` (optional, string) - The street address of the user's place of business.
 - ``usage_location`` (optional, string) - A two letter country code (ISO standard 3166). Required for users that will be assigned licenses due to legal requirement to check for availability of services in countries. Examples include: "US", "JP", "GB" etc.
-
+- ``licenses`` (optional, string) - Set of licenses to be assigned.
+- ``disabled_plans`` (optional, string) - Id's of Service Plans that should not be provisionied for the user.
+- ``skuid`` (optional, string) - Id of the License to be assigned to the user.
 
 ### Exceptions
 - Read User API only reads defined attributes in response, you can find the list [here](https://docs.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#response-1).

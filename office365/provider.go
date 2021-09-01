@@ -31,7 +31,8 @@ func Provider() *schema.Provider {
 			},
 		},
 		ResourcesMap: map[string]*schema.Resource{
-			"office365_user": resourceUser(),
+			"office365_user":         resourceUser(),
+			"office365_user_license": resourceUserLicense(),
 		},
 		DataSourcesMap: map[string]*schema.Resource{
 			"office365_user": dataSourceUsers(),
@@ -54,7 +55,7 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		})
 		return nil, diags
 	}
-	err := t.GetToken(clienId, clientSecret, tenantId)
+	bearer, err := t.GetToken(clienId, clientSecret, tenantId)
 	if err != nil {
 		os.Setenv("bearer", "")
 		diags = append(diags, diag.Diagnostic{
@@ -64,6 +65,5 @@ func providerConfigure(ctx context.Context, d *schema.ResourceData) (interface{}
 		})
 		return nil, diags
 	}
-	bearer := os.Getenv("bearer")
 	return client.NewClient(bearer), diags
 }
